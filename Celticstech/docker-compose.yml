@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+
+  celticstech-api:
+    build: .
+    container_name: celticstech-api-561450
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=CelticstechDb;Username=postgres;Password=postgres
+    depends_on:
+      - postgres-db
+    networks:
+      - celticstech-network
+
+  postgres-db:
+    image: postgres:16
+    container_name: postgres-db-561450
+    environment:
+      POSTGRES_DB: CelticstechDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - celticstech-network
+
+volumes:
+  postgres_data:
+
+networks:
+  celticstech-network:
