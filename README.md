@@ -76,7 +76,7 @@ Caso não exista uma regra específica cadastrada, o sistema gera uma recomenda�
 
 ## Modelagem do Banco de Dados
 
-! [Modelagem do Banco](images/modelagem_banco.png)
+![Modelagem do Banco](Celticstech/Images/Modelagem_Banco.jpeg)
 
 ---
 
