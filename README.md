@@ -2,265 +2,228 @@
 
 ## Integrantes
 
-- João Victor Vendrameto - RM 563665 - 2TDSPV
-- Nicolas de Oliveira Jacob - RM 564205 - 2TDSPX
-- Gabriel Ambrósio Saraiva - RM 566552 - 2TDSPV
-- Vinicius Romaguera Cardozo - RM 562308 - 2TDSPX
-- Yuri Fuzinatto Garzoli Barreto - RM 561450 - 2TDSPX
+* João Victor Vendrameto - RM 563665
+* Nicolas de Oliveira Jacob - RM 564205
+* Gabriel Ambrósio Saraiva - RM 566552
+* Vinicius Romaguera Cardozo - RM 562308
+* Yuri Fuzinatto Garzoli Barreto - RM 561450
 
 ---
 
-# Objetivo do Projeto
+## Repositório
 
-O Celticstech foi desenvolvido para auxiliar associações agrícolas da região Nordeste no gerenciamento de cultivos e recomendações agrícolas.
+GitHub:
 
-A aplicação permite cadastrar regiões, associações, agricultores, cultivos e recomendações, mantendo o relacionamento entre as entidades e facilitando a tomada de decisão.
-
----
-
-# Tecnologias Utilizadas
-
-- .NET 8
-- ASP.NET Core Web API
-- Entity Framework Core
-- PostgreSQL
-- Swagger
-- Docker
-- Docker Compose
+https://github.com/Yurifgb06/Celticstech
 
 ---
 
-# Funcionalidades
+## Sobre o Projeto
 
-- Cadastro de Regiões
-- Cadastro de Associações
-- Cadastro de Agricultores
-- Cadastro de Cultivos
-- Cadastro de Recomendações
-- Relacionamento entre as entidades
-- Geração automática de recomendações agrícolas
-- Validação de dados
-- Health Check
-- Documentação da API com Swagger
-- Execução em containers Docker
+O Celticstech é uma API REST desenvolvida em .NET 8 com o objetivo de auxiliar associações agrícolas da região Nordeste do Brasil.
+
+A aplicação permite o gerenciamento de regiões, associações, agricultores, cultivos e recomendações agrícolas, utilizando PostgreSQL como banco de dados e Entity Framework Core para persistência dos dados.
+
+Além do CRUD completo, o sistema gera recomendações automáticas com base no cultivo informado, auxiliando no planejamento agrícola.
 
 ---
 
-# Estrutura do Projeto
+## Tecnologias Utilizadas
 
-```text
-Controllers
-Models
-DTOs
-Data
-Migrations
-Properties
-Dockerfile
-docker-compose.yml
-Program.cs
-appsettings.json
-```
+* .NET 8
+* ASP.NET Core Web API
+* Entity Framework Core
+* PostgreSQL
+* Swagger / OpenAPI
+* Docker
+* Docker Compose
 
 ---
 
-# Modelagem do Banco
+## Estrutura do Projeto
 
-Inserir abaixo a imagem da modelagem utilizada no projeto.
-
-![Modelagem do Banco](Celticstech/Images/Modelagem_Banco.jpeg)
-
----
-
-# Relacionamentos
-
-A aplicação utiliza relacionamentos entre as entidades para garantir a integridade dos dados.
-
-Exemplos:
-
-- Uma Região pode possuir várias Associações.
-- Uma Associação pode possuir várias Recomendações.
-- Um Cultivo pode possuir várias Recomendações.
-
-Relacionamento utilizado:
-
-```text
-1:N (Um para Muitos)
-```
+* Controllers
+* DTOs
+* Models
+* Data
+* Migrations
 
 ---
 
-# Recomendação Automática
+## Relacionamentos
+
+* Uma Região pode possuir várias Associações.
+* Uma Associação pode possuir várias Recomendações.
+* Um Cultivo pode possuir várias Recomendações.
+
+---
+
+## Regra de Negócio
 
 O sistema gera automaticamente recomendações agrícolas de acordo com o cultivo informado.
 
-O usuário informa apenas:
-
-- Data da recomendação
-- Associação
-- Cultivo
-
-A API gera automaticamente:
-
-- Tipo da recomendação
-- Orientação
-
 Exemplos:
 
-- Milho → Irrigação
-- Soja → Monitoramento de umidade
-- Caju → Atenção aos períodos de seca
-- Cana-de-açúcar → Controle de irrigação
+* Milho → Irrigação
+* Soja → Irrigação
+* Algodão → Colheita
+* Caju → Não Irrigar
+* Cana-de-açúcar → Não Irrigar
 
-Dessa forma o usuário não precisa cadastrar manualmente as recomendações.
-
----
-
-# Segurança
-
-A entidade Associação possui campo de senha para cadastro.
-
-Porém, por questões de segurança, a senha não é retornada nos endpoints de consulta (GET).
+Caso não exista uma regra específica cadastrada, o sistema gera uma recomendação genérica baseada em monitoramento climático e irrigação.
 
 ---
 
-# Banco de Dados
+## Modelagem do Banco de Dados
 
-Banco utilizado:
+! [Modelagem do Banco](images/modelagem_banco.png)
+
+---
+
+## Como Executar o Projeto
+
+### Configurar Banco de Dados
+
+Ajuste a Connection String no arquivo:
 
 ```text
-PostgreSQL
+appsettings.json
 ```
 
-A persistência dos dados é realizada através do Entity Framework Core.
-
-As tabelas são criadas através das migrations.
-
----
-
-# Migrations
-
-Para criar uma migration:
-
-```powershell
-Add-Migration NomeDaMigration
-```
-
-Para atualizar o banco:
+### Aplicar Migrations
 
 ```powershell
 Update-Database
 ```
 
----
-
-# Executando o Projeto
-
-## Executando Localmente
-
-1. Abrir o projeto no Visual Studio.
-2. Configurar a conexão com PostgreSQL.
-3. Executar:
+### Executar Aplicação
 
 ```powershell
-Update-Database
+dotnet run
 ```
 
-4. Iniciar a aplicação.
+### Executar com Docker
 
-Swagger:
-
-```text
-https://localhost:7113/swagger
-```
-
-Health Check:
-
-```text
-https://localhost:7113/health
-```
-
----
-
-# Executando com Docker
-
-Na pasta do projeto:
-
-```bash
+```powershell
 docker compose up --build
 ```
 
-Swagger:
-
-```text
-http://localhost:8080/swagger
-```
-
-Health Check:
-
-```text
-http://localhost:8080/health
-```
-
 ---
 
-# Testes Realizados
-
-Foram realizados testes completos utilizando o Swagger.
+## Endpoints
 
 ### Regiões
 
-- Create
-- Read
-- Update
-- Delete
+* GET /api/Regioes
+* GET /api/Regioes/{id}
+* POST /api/Regioes
+* PUT /api/Regioes/{id}
+* DELETE /api/Regioes/{id}
 
 ### Associações
 
-- Create
-- Read
-- Update
-- Delete
+* GET /api/Associacoes
+* GET /api/Associacoes/{id}
+* POST /api/Associacoes
+* PUT /api/Associacoes/{id}
+* DELETE /api/Associacoes/{id}
 
 ### Agricultores
 
-- Create
-- Read
-- Update
-- Delete
+* GET /api/Agricultores
+* GET /api/Agricultores/{id}
+* POST /api/Agricultores
+* PUT /api/Agricultores/{id}
+* DELETE /api/Agricultores/{id}
 
 ### Cultivos
 
-- Create
-- Read
-- Update
-- Delete
+* GET /api/Cultivos
+* GET /api/Cultivos/{id}
+* POST /api/Cultivos
+* PUT /api/Cultivos/{id}
+* DELETE /api/Cultivos/{id}
 
 ### Recomendações
 
-- Create
-- Read
-- Update
-- Delete
-
-Também foram realizados testes de:
-
-- Relacionamentos
-- Health Check
-- Docker
-- Persistência em banco de dados
+* GET /api/Recomendacoes
+* GET /api/Recomendacoes/{id}
+* POST /api/Recomendacoes
+* PUT /api/Recomendacoes/{id}
+* DELETE /api/Recomendacoes/{id}
 
 ---
 
-# Endpoints Principais
+## Testes Realizados
 
-```text
-/api/Regioes
-/api/Associacoes
-/api/Agricultores
-/api/Cultivos
-/api/Recomendacoes
-/health
+### Regiões
+
+* Cadastro de regiões.
+* Consulta por ID.
+* Consulta geral.
+* Atualização de registros.
+* Remoção de registros.
+
+### Associações
+
+* Cadastro de associações.
+* Validação de região existente.
+* Consulta por ID.
+* Consulta geral.
+* Atualização de registros.
+* Remoção de registros.
+
+### Agricultores
+
+* Cadastro de agricultores.
+* Consulta por ID.
+* Consulta geral.
+* Atualização de registros.
+* Remoção de registros.
+
+### Cultivos
+
+* Cadastro de cultivos.
+* Validação do porte do cultivo.
+* Consulta por ID.
+* Consulta geral.
+* Atualização de registros.
+* Remoção de registros.
+
+### Recomendações
+
+* Geração automática de recomendações.
+* Validação de associação existente.
+* Validação de cultivo existente.
+* Consulta por ID.
+* Consulta geral.
+* Atualização de registros.
+* Remoção de registros.
+
+### Infraestrutura
+
+* PostgreSQL.
+* Entity Framework Migrations.
+* Docker.
+* Docker Compose.
+* Health Check.
+
+---
+
+## Health Check
+
+Endpoint para monitoramento da aplicação:
+
+```http
+GET /health
 ```
 
 ---
 
+## Swagger
+
+A documentação completa da API está disponível através do Swagger:
+
+```text
+/swagger
+```
