@@ -307,7 +307,7 @@ Swagger continua disponivel em:
 http://localhost:5000/swagger
 ```
 
-Health Check:
+### Recomendações
 
 ```text
 http://localhost:5000/health
