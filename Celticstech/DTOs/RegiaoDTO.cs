@@ -4,12 +4,12 @@ namespace Celticstech.DTOs
 {
     public class RegiaoDTO
     {
-        [Required]
-        [MaxLength(50)]
+        [Required(ErrorMessage = "O nome da região é obrigatório.")]
+        [MaxLength(50, ErrorMessage = "O nome da região deve ter no máximo 50 caracteres.")]
         public string NomeRegiao { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(2)]
+        [Required(ErrorMessage = "A UF da região é obrigatória.")]
+        [MaxLength(2, ErrorMessage = "A UF deve ter no máximo 2 caracteres.")]
         public string UfRegiao { get; set; } = string.Empty;
     }
 }

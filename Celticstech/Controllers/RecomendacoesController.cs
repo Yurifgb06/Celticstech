@@ -44,6 +44,40 @@ namespace Celticstech.Controllers
         }
 
         /// <summary>
+        /// Retorna o historico de recomendacoes geradas com dados climaticos.
+        /// </summary>
+        [HttpGet("historico-climatico")]
+        public async Task<ActionResult<IEnumerable<HistoricoClimaticoResponseDTO>>> GetHistoricoClimatico(
+            CancellationToken cancellationToken)
+        {
+            return await _context.Recomendacoes
+                .AsNoTracking()
+                .Where(r =>
+                    r.ScoreRisco.HasValue &&
+                    r.Temperatura.HasValue &&
+                    r.Umidade.HasValue &&
+                    r.Chuva.HasValue &&
+                    r.VelocidadeVento.HasValue)
+                .OrderByDescending(r => r.DataRecAsc)
+                .Select(r => new HistoricoClimaticoResponseDTO
+                {
+                    IdRecomendacao = r.IdRecomendacao,
+                    Data = r.DataRecAsc,
+                    Associacao = r.Associacao != null ? r.Associacao.NomeAssociacao : string.Empty,
+                    Cultivo = r.Cultivo != null ? r.Cultivo.NomeCultivo : string.Empty,
+                    NivelRisco = r.NivelRisco ?? string.Empty,
+                    ScoreRisco = r.ScoreRisco ?? 0,
+                    Temperatura = r.Temperatura ?? 0,
+                    Umidade = r.Umidade ?? 0,
+                    Chuva = r.Chuva ?? 0,
+                    VelocidadeVento = r.VelocidadeVento ?? 0,
+                    Orientacao = r.Orientacao,
+                    FonteDados = r.FonteDados ?? string.Empty
+                })
+                .ToListAsync(cancellationToken);
+        }
+
+        /// <summary>
         /// Retorna uma recomendação específica pelo ID.
         /// </summary>
         /// <param name="id">ID da recomendação.</param>
