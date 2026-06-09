@@ -17,6 +17,10 @@ namespace Celticstech.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Retorna todas as recomendações cadastradas.
+        /// </summary>
+        /// <returns>Lista de recomendações com associação e cultivo relacionados.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RecomendacaoResponseDTO>>> GetRecomendacoes()
         {
@@ -39,6 +43,11 @@ namespace Celticstech.Controllers
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Retorna uma recomendação específica pelo ID.
+        /// </summary>
+        /// <param name="id">ID da recomendação.</param>
+        /// <returns>Dados da recomendação encontrada.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<RecomendacaoResponseDTO>> GetRecomendacao(int id)
         {
@@ -69,6 +78,11 @@ namespace Celticstech.Controllers
             return recomendacao;
         }
 
+        /// <summary>
+        /// Gera automaticamente uma recomendação agrícola com base no cultivo informado.
+        /// </summary>
+        /// <param name="dto">Dados necessários para geração da recomendação.</param>
+        /// <returns>Recomendação criada automaticamente.</returns>
         [HttpPost]
         public async Task<ActionResult<RecomendacaoResponseDTO>> PostRecomendacao(RecomendacaoDTO dto)
         {
@@ -121,6 +135,12 @@ namespace Celticstech.Controllers
                 response);
         }
 
+        /// <summary>
+        /// Atualiza uma recomendação existente e recalcula a orientação com base no cultivo.
+        /// </summary>
+        /// <param name="id">ID da recomendação.</param>
+        /// <param name="dto">Novos dados da recomendação.</param>
+        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRecomendacao(int id, RecomendacaoDTO dto)
         {
@@ -160,6 +180,11 @@ namespace Celticstech.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Remove uma recomendação cadastrada.
+        /// </summary>
+        /// <param name="id">ID da recomendação.</param>
+        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecomendacao(int id)
         {

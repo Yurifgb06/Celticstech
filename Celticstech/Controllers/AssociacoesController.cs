@@ -17,6 +17,10 @@ namespace Celticstech.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Retorna todas as associações cadastradas.
+        /// </summary>
+        /// <returns>Lista de associações sem exibir a senha.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AssociacaoResponseDTO>>> GetAssociacoes()
         {
@@ -35,6 +39,11 @@ namespace Celticstech.Controllers
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Retorna uma associação específica pelo ID.
+        /// </summary>
+        /// <param name="id">ID da associação.</param>
+        /// <returns>Dados da associação encontrada.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<AssociacaoResponseDTO>> GetAssociacao(int id)
         {
@@ -61,6 +70,11 @@ namespace Celticstech.Controllers
             return associacao;
         }
 
+        /// <summary>
+        /// Cadastra uma nova associação.
+        /// </summary>
+        /// <param name="dto">Dados da associação.</param>
+        /// <returns>Associação criada com sucesso.</returns>
         [HttpPost]
         public async Task<ActionResult<AssociacaoResponseDTO>> PostAssociacao(AssociacaoDTO dto)
         {
@@ -94,9 +108,17 @@ namespace Celticstech.Controllers
                 Login = associacao.Login
             };
 
-            return CreatedAtAction(nameof(GetAssociacao), new { id = associacao.IdAssociacao }, response);
+            return CreatedAtAction(nameof(GetAssociacao),
+                new { id = associacao.IdAssociacao },
+                response);
         }
 
+        /// <summary>
+        /// Atualiza os dados de uma associação existente.
+        /// </summary>
+        /// <param name="id">ID da associação.</param>
+        /// <param name="dto">Novos dados da associação.</param>
+        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAssociacao(int id, AssociacaoDTO dto)
         {
@@ -126,6 +148,11 @@ namespace Celticstech.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Remove uma associação cadastrada.
+        /// </summary>
+        /// <param name="id">ID da associação.</param>
+        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAssociacao(int id)
         {

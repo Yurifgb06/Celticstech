@@ -17,16 +17,48 @@ namespace Celticstech.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Retorna todos os cultivos cadastrados.
+        /// </summary>
+        /// <returns>Lista de cultivos.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cultivo>>> GetCultivos()
+        public async Task<ActionResult<IEnumerable<CultivoResponseDTO>>> GetCultivos()
         {
-            return await _context.Cultivos.ToListAsync();
+            return await _context.Cultivos
+                .Select(c => new CultivoResponseDTO
+                {
+                    IdCultivo = c.IdCultivo,
+                    NomeCultivo = c.NomeCultivo,
+                    CategoriaCultivo = c.CategoriaCultivo,
+                    PorteCultivo = c.PorteCultivo,
+                    TempoColheita = c.TempoColheita,
+                    VidaUtil = c.VidaUtil,
+                    Intermitencia = c.Intermitencia
+                })
+                .ToListAsync();
         }
 
+        /// <summary>
+        /// Retorna um cultivo específico pelo ID.
+        /// </summary>
+        /// <param name="id">ID do cultivo.</param>
+        /// <returns>Dados do cultivo encontrado.</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cultivo>> GetCultivo(int id)
+        public async Task<ActionResult<CultivoResponseDTO>> GetCultivo(int id)
         {
-            var cultivo = await _context.Cultivos.FindAsync(id);
+            var cultivo = await _context.Cultivos
+                .Where(c => c.IdCultivo == id)
+                .Select(c => new CultivoResponseDTO
+                {
+                    IdCultivo = c.IdCultivo,
+                    NomeCultivo = c.NomeCultivo,
+                    CategoriaCultivo = c.CategoriaCultivo,
+                    PorteCultivo = c.PorteCultivo,
+                    TempoColheita = c.TempoColheita,
+                    VidaUtil = c.VidaUtil,
+                    Intermitencia = c.Intermitencia
+                })
+                .FirstOrDefaultAsync();
 
             if (cultivo == null)
             {
@@ -36,8 +68,13 @@ namespace Celticstech.Controllers
             return cultivo;
         }
 
+        /// <summary>
+        /// Cadastra um novo cultivo.
+        /// </summary>
+        /// <param name="dto">Dados do cultivo.</param>
+        /// <returns>Cultivo criado com sucesso.</returns>
         [HttpPost]
-        public async Task<ActionResult<Cultivo>> PostCultivo(CultivoDTO dto)
+        public async Task<ActionResult<CultivoResponseDTO>> PostCultivo(CultivoDTO dto)
         {
             var portesValidos = new[] { "ARBUSTO", "RAIZ", "ARVORE", "HORTALICA" };
 
@@ -57,14 +94,30 @@ namespace Celticstech.Controllers
             };
 
             _context.Cultivos.Add(cultivo);
-
             await _context.SaveChangesAsync();
+
+            var response = new CultivoResponseDTO
+            {
+                IdCultivo = cultivo.IdCultivo,
+                NomeCultivo = cultivo.NomeCultivo,
+                CategoriaCultivo = cultivo.CategoriaCultivo,
+                PorteCultivo = cultivo.PorteCultivo,
+                TempoColheita = cultivo.TempoColheita,
+                VidaUtil = cultivo.VidaUtil,
+                Intermitencia = cultivo.Intermitencia
+            };
 
             return CreatedAtAction(nameof(GetCultivo),
                 new { id = cultivo.IdCultivo },
-                cultivo);
+                response);
         }
 
+        /// <summary>
+        /// Atualiza os dados de um cultivo existente.
+        /// </summary>
+        /// <param name="id">ID do cultivo.</param>
+        /// <param name="dto">Novos dados do cultivo.</param>
+        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCultivo(int id, CultivoDTO dto)
         {
@@ -94,6 +147,11 @@ namespace Celticstech.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Remove um cultivo cadastrado.
+        /// </summary>
+        /// <param name="id">ID do cultivo.</param>
+        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCultivo(int id)
         {
@@ -105,7 +163,6 @@ namespace Celticstech.Controllers
             }
 
             _context.Cultivos.Remove(cultivo);
-
             await _context.SaveChangesAsync();
 
             return NoContent();
