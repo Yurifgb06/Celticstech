@@ -1,6 +1,7 @@
 using Celticstech.Data;
 using Celticstech.DTOs;
 using Celticstech.Models;
+using Celticstech.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,16 +12,14 @@ namespace Celticstech.Controllers
     public class RegioesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly CoordenadasService _coordenadasService;
 
-        public RegioesController(AppDbContext context)
+        public RegioesController(AppDbContext context, CoordenadasService coordenadasService)
         {
             _context = context;
+            _coordenadasService = coordenadasService;
         }
 
-        /// <summary>
-        /// Retorna todas as regiões cadastradas.
-        /// </summary>
-        /// <returns>Lista de regiões.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RegiaoResponseDTO>>> GetRegioes()
         {
@@ -29,16 +28,13 @@ namespace Celticstech.Controllers
                 {
                     IdRegiao = r.IdRegiao,
                     NomeRegiao = r.NomeRegiao,
-                    UfRegiao = r.UfRegiao
+                    UfRegiao = r.UfRegiao,
+                    Latitude = r.Latitude,
+                    Longitude = r.Longitude
                 })
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Retorna uma região específica pelo ID.
-        /// </summary>
-        /// <param name="id">ID da região.</param>
-        /// <returns>Dados da região encontrada.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<RegiaoResponseDTO>> GetRegiao(int id)
         {
@@ -48,83 +44,87 @@ namespace Celticstech.Controllers
                 {
                     IdRegiao = r.IdRegiao,
                     NomeRegiao = r.NomeRegiao,
-                    UfRegiao = r.UfRegiao
+                    UfRegiao = r.UfRegiao,
+                    Latitude = r.Latitude,
+                    Longitude = r.Longitude
                 })
                 .FirstOrDefaultAsync();
 
             if (regiao == null)
-            {
                 return NotFound("Região não encontrada.");
-            }
 
             return regiao;
         }
 
-        /// <summary>
-        /// Cadastra uma nova região.
-        /// </summary>
-        /// <param name="dto">Dados da região.</param>
-        /// <returns>Região criada com sucesso.</returns>
         [HttpPost]
         public async Task<ActionResult<RegiaoResponseDTO>> PostRegiao(RegiaoDTO dto)
         {
-            var regiao = new Regiao
+            try
             {
-                NomeRegiao = dto.NomeRegiao,
-                UfRegiao = dto.UfRegiao.ToUpper()
-            };
+                var coordenadas = _coordenadasService.ObterCoordenadasPorUf(dto.UfRegiao);
 
-            _context.Regioes.Add(regiao);
-            await _context.SaveChangesAsync();
+                var regiao = new Regiao
+                {
+                    NomeRegiao = dto.NomeRegiao,
+                    UfRegiao = dto.UfRegiao.Trim().ToUpper(),
+                    Latitude = coordenadas.Latitude,
+                    Longitude = coordenadas.Longitude
+                };
 
-            var response = new RegiaoResponseDTO
+                _context.Regioes.Add(regiao);
+                await _context.SaveChangesAsync();
+
+                var response = new RegiaoResponseDTO
+                {
+                    IdRegiao = regiao.IdRegiao,
+                    NomeRegiao = regiao.NomeRegiao,
+                    UfRegiao = regiao.UfRegiao,
+                    Latitude = regiao.Latitude,
+                    Longitude = regiao.Longitude
+                };
+
+                return CreatedAtAction(nameof(GetRegiao), new { id = regiao.IdRegiao }, response);
+            }
+            catch (ArgumentException ex)
             {
-                IdRegiao = regiao.IdRegiao,
-                NomeRegiao = regiao.NomeRegiao,
-                UfRegiao = regiao.UfRegiao
-            };
-
-            return CreatedAtAction(nameof(GetRegiao), new { id = regiao.IdRegiao }, response);
+                return BadRequest(ex.Message);
+            }
         }
 
-        /// <summary>
-        /// Atualiza os dados de uma região existente.
-        /// </summary>
-        /// <param name="id">ID da região.</param>
-        /// <param name="dto">Novos dados da região.</param>
-        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRegiao(int id, RegiaoDTO dto)
         {
-            var regiao = await _context.Regioes.FindAsync(id);
-
-            if (regiao == null)
+            try
             {
-                return NotFound("Região não encontrada.");
+                var regiao = await _context.Regioes.FindAsync(id);
+
+                if (regiao == null)
+                    return NotFound("Região não encontrada.");
+
+                var coordenadas = _coordenadasService.ObterCoordenadasPorUf(dto.UfRegiao);
+
+                regiao.NomeRegiao = dto.NomeRegiao;
+                regiao.UfRegiao = dto.UfRegiao.Trim().ToUpper();
+                regiao.Latitude = coordenadas.Latitude;
+                regiao.Longitude = coordenadas.Longitude;
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
             }
-
-            regiao.NomeRegiao = dto.NomeRegiao;
-            regiao.UfRegiao = dto.UfRegiao.ToUpper();
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        /// <summary>
-        /// Remove uma região cadastrada.
-        /// </summary>
-        /// <param name="id">ID da região.</param>
-        /// <returns>Sem conteúdo em caso de sucesso.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRegiao(int id)
         {
             var regiao = await _context.Regioes.FindAsync(id);
 
             if (regiao == null)
-            {
                 return NotFound("Região não encontrada.");
-            }
 
             _context.Regioes.Remove(regiao);
             await _context.SaveChangesAsync();

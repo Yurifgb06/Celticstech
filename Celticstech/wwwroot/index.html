@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Painel de monitoramento agricola e climatico Celticstech">
+    <title>Celticstech | Monitoramento Agricola Inteligente</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="hero-header">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container">
+                    <a class="navbar-brand" href="#">
+                        <span>
+                            <strong>Celticstech</strong>
+                            <small>Monitoramento Agricola Inteligente</small>
+                        </span>
+                    </a>
+                    <div class="header-actions">
+                        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Ativar modo escuro">
+                            <i class="bi bi-moon-stars-fill"></i>
+                            <span>Modo escuro</span>
+                        </button>
+                        <div class="weather-status" id="openMeteoStatus">
+                            <span class="status-dot"></span>
+                            <span>Open-Meteo Online</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container hero-content">
+                <div class="row align-items-end g-4">
+                    <div class="col-lg-8">
+                        <span class="eyebrow">Economia espacial aplicada ao campo</span>
+                        <h1>Dados climaticos que ajudam a cultivar decisoes melhores.</h1>
+                        <p>Visao integrada de regioes, risco climatico e recomendacoes agricolas em tempo real.</p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <div class="last-update">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <span>Atualizado em <strong id="lastUpdate">--</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container dashboard-main">
+            <div id="globalAlert" class="alert alert-danger d-none" role="alert"></div>
+
+            <section class="dashboard-section" aria-labelledby="dashboardTitle">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-kicker">Visao geral</span>
+                        <h2 id="dashboardTitle">Dashboard operacional</h2>
+                    </div>
+                    <button class="btn btn-outline-success btn-sm" id="refreshDashboard" type="button">
+                        <i class="bi bi-arrow-clockwise"></i> Atualizar
+                    </button>
+                </div>
+
+                <div class="row g-3" id="dashboardCards">
+                    <div class="col-6 col-xl">
+                        <article class="metric-card">
+                            <span class="metric-icon icon-region"><i class="bi bi-geo-alt"></i></span>
+                            <span class="metric-label">Regioes</span>
+                            <strong class="metric-value placeholder-glow" id="totalRegioes"><span class="placeholder col-5"></span></strong>
+                            <small>Areas monitoradas</small>
+                        </article>
+                    </div>
+                    <div class="col-6 col-xl">
+                        <article class="metric-card">
+                            <span class="metric-icon icon-association"><i class="bi bi-people"></i></span>
+                            <span class="metric-label">Associacoes</span>
+                            <strong class="metric-value placeholder-glow" id="totalAssociacoes"><span class="placeholder col-5"></span></strong>
+                            <small>Entidades cadastradas</small>
+                        </article>
+                    </div>
+                    <div class="col-6 col-xl">
+                        <article class="metric-card">
+                            <span class="metric-icon icon-crop"><i class="bi bi-flower1"></i></span>
+                            <span class="metric-label">Cultivos</span>
+                            <strong class="metric-value placeholder-glow" id="totalCultivos"><span class="placeholder col-5"></span></strong>
+                            <small>Culturas acompanhadas</small>
+                        </article>
+                    </div>
+                    <div class="col-6 col-xl">
+                        <article class="metric-card">
+                            <span class="metric-icon icon-association"><i class="bi bi-person-workspace"></i></span>
+                            <span class="metric-label">Agricultores</span>
+                            <strong class="metric-value placeholder-glow" id="totalAgricultores"><span class="placeholder col-5"></span></strong>
+                            <small>Produtores vinculados</small>
+                        </article>
+                    </div>
+                    <div class="col-6 col-xl">
+                        <article class="metric-card">
+                            <span class="metric-icon icon-recommendation"><i class="bi bi-clipboard2-pulse"></i></span>
+                            <span class="metric-label">Recomendacoes</span>
+                            <strong class="metric-value placeholder-glow" id="totalRecomendacoes"><span class="placeholder col-5"></span></strong>
+                            <small>Orientacoes geradas</small>
+                        </article>
+                    </div>
+                    <div class="col-12 col-xl">
+                        <article class="metric-card status-card">
+                            <span class="metric-icon icon-status"><i class="bi bi-shield-check"></i></span>
+                            <span class="metric-label">Status sistema</span>
+                            <strong class="system-status" id="statusSistema">Verificando...</strong>
+                            <small id="integracaoOpenMeteo">Integracao climatica</small>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section" aria-labelledby="climateTitle">
+                <div class="section-heading align-items-end">
+                    <div>
+                        <span class="section-kicker">Monitoramento ao vivo</span>
+                        <h2 id="climateTitle">Consulta climatica</h2>
+                    </div>
+                    <div class="region-selector">
+                        <label for="regionSelect" class="form-label">Regiao monitorada</label>
+                        <div class="input-group">
+                            <select class="form-select" id="regionSelect" disabled>
+                                <option value="">Carregando regioes...</option>
+                            </select>
+                            <button class="btn btn-success" id="consultClimate" type="button" disabled>
+                                <i class="bi bi-cloud-sun"></i>
+                                <span>Consultar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-xl-8">
+                        <div class="panel-card climate-panel">
+                            <div class="climate-location">
+                                <div>
+                                    <span class="location-icon"><i class="bi bi-geo-alt-fill"></i></span>
+                                    <span>
+                                        <small>Condicoes atuais</small>
+                                        <strong id="climateRegion">Selecione uma regiao</strong>
+                                    </span>
+                                </div>
+                                <span class="uf-badge" id="climateUf">--</span>
+                            </div>
+
+                            <div class="climate-grid">
+                                <article class="climate-metric temperature">
+                                    <i class="bi bi-thermometer-half"></i>
+                                    <span>Temperatura</span>
+                                    <strong><span id="temperatureValue">--</span><small>°C</small></strong>
+                                </article>
+                                <article class="climate-metric humidity">
+                                    <i class="bi bi-droplet-half"></i>
+                                    <span>Umidade</span>
+                                    <strong><span id="humidityValue">--</span><small>%</small></strong>
+                                </article>
+                                <article class="climate-metric rain">
+                                    <i class="bi bi-cloud-rain"></i>
+                                    <span>Chuva</span>
+                                    <strong><span id="rainValue">--</span><small>mm</small></strong>
+                                </article>
+                                <article class="climate-metric wind">
+                                    <i class="bi bi-wind"></i>
+                                    <span>Vento</span>
+                                    <strong><span id="windValue">--</span><small>km/h</small></strong>
+                                </article>
+                            </div>
+
+                            <div class="risk-summary">
+                                <div class="risk-gauge" id="riskGauge" style="--risk-value: 0">
+                                    <div>
+                                        <strong id="riskScore">--</strong>
+                                        <small>/ 100</small>
+                                    </div>
+                                </div>
+                                <div class="risk-copy">
+                                    <span>Score de risco climatico</span>
+                                    <div class="d-flex align-items-center flex-wrap gap-2">
+                                        <strong id="riskLabel">Aguardando dados</strong>
+                                        <span class="risk-badge risk-neutral" id="riskBadge">--</span>
+                                    </div>
+                                    <small>Calculado com temperatura, chuva, umidade e vento.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4">
+                        <div class="panel-card chart-panel">
+                            <div class="panel-heading">
+                                <div>
+                                    <small>Comparativo</small>
+                                    <h3>Indicadores climaticos</h3>
+                                </div>
+                                <i class="bi bi-bar-chart-fill"></i>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="climateChart" aria-label="Grafico de indicadores climaticos"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section" aria-labelledby="diagnosisTitle">
+                <div class="diagnosis-card">
+                    <div class="diagnosis-intro">
+                        <span class="diagnosis-icon"><i class="bi bi-stars"></i></span>
+                        <div>
+                            <span class="section-kicker">Analise inteligente</span>
+                            <h2 id="diagnosisTitle">Diagnostico climatico</h2>
+                            <p>Gere uma orientacao agricola com base nas condicoes atuais da regiao selecionada.</p>
+                        </div>
+                        <div class="diagnosis-selector">
+                            <label class="form-label mb-1" for="diagnosisCropSelect">Cultivo monitorado</label>
+                            <select class="form-select" id="diagnosisCropSelect" disabled>
+                                <option value="">Carregando cultivos...</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success btn-lg" id="generateDiagnosis" type="button" disabled>
+                            <span class="button-content"><i class="bi bi-lightning-charge-fill"></i> Gerar diagnostico</span>
+                            <span class="button-loading d-none"><span class="spinner-border spinner-border-sm"></span> Analisando...</span>
+                        </button>
+                    </div>
+
+                    <div class="diagnosis-result d-none" id="diagnosisResult">
+                        <div class="diagnosis-score">
+                            <span>Score de risco</span>
+                            <strong><span id="diagnosisScore">--</span><small>/100</small></strong>
+                            <span class="risk-badge" id="diagnosisBadge">--</span>
+                            <small class="diagnosis-region">
+                                <i class="bi bi-geo-alt"></i>
+                                <span id="diagnosisRegion">Regiao monitorada</span>
+                            </small>
+                            <small class="diagnosis-region">
+                                <i class="bi bi-flower1"></i>
+                                <span id="diagnosisCrop">Cultivo monitorado</span>
+                            </small>
+                        </div>
+                        <div class="diagnosis-details">
+                            <div class="diagnosis-summary">
+                                <span>Resumo do risco</span>
+                                <h3 id="diagnosisSummary">Aguardando analise</h3>
+                            </div>
+                            <div class="diagnosis-detail-grid">
+                                <article>
+                                    <i class="bi bi-exclamation-diamond"></i>
+                                    <div>
+                                        <span>Motivo</span>
+                                        <p id="diagnosisReason">--</p>
+                                    </div>
+                                </article>
+                                <article>
+                                    <i class="bi bi-flag"></i>
+                                    <div>
+                                        <span>Prioridade</span>
+                                        <p id="diagnosisPriority">--</p>
+                                    </div>
+                                </article>
+                                <article>
+                                    <i class="bi bi-clock-history"></i>
+                                    <div>
+                                        <span>Prazo sugerido</span>
+                                        <p id="diagnosisDeadline">--</p>
+                                    </div>
+                                </article>
+                            </div>
+                            <div class="diagnosis-actions">
+                                <span><i class="bi bi-list-check"></i> Acoes recomendadas</span>
+                                <ol id="diagnosisActions"></ol>
+                            </div>
+                            <div class="diagnosis-technical">
+                                <i class="bi bi-info-circle"></i>
+                                <span id="diagnosisTechnical">Recomendacao calculada com dados climaticos em tempo real.</span>
+                            </div>
+                            <small class="diagnosis-source">
+                                <i class="bi bi-cloud-check"></i>
+                                Fonte: <span id="diagnosisSource">Open-Meteo API</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section pb-5" aria-labelledby="historyTitle">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-kicker">Registros recentes</span>
+                        <h2 id="historyTitle">Historico climatico</h2>
+                    </div>
+                    <button class="btn btn-outline-success btn-sm" id="refreshHistory" type="button">
+                        <i class="bi bi-arrow-clockwise"></i> Atualizar
+                    </button>
+                </div>
+
+                <div class="panel-card table-panel">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Temperatura</th>
+                                    <th>Umidade</th>
+                                    <th>Chuva</th>
+                                    <th>Vento</th>
+                                    <th>Score</th>
+                                    <th>Risco</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody">
+                                <tr>
+                                    <td colspan="7" class="empty-state">
+                                        <span class="spinner-border spinner-border-sm text-success"></span>
+                                        Carregando historico...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer">
+                        <small id="historyCount">0 registros</small>
+                        <small class="history-hint"><i class="bi bi-cursor"></i> Selecione um registro para ver os detalhes</small>
+                        <nav aria-label="Paginacao do historico">
+                            <ul class="pagination pagination-sm mb-0" id="historyPagination"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section pb-5" aria-labelledby="managementTitle">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-kicker">Cadastros da plataforma</span>
+                        <h2 id="managementTitle">Gerenciamento</h2>
+                    </div>
+                    <button class="btn btn-success btn-sm" id="newRecord" type="button">
+                        <i class="bi bi-plus-lg"></i> Novo registro
+                    </button>
+                </div>
+
+                <div class="panel-card management-panel">
+                    <div class="management-tabs" id="managementTabs" role="tablist" aria-label="Entidades gerenciadas">
+                        <button class="management-tab active" type="button" data-entity="regions">
+                            <i class="bi bi-geo-alt"></i> Regioes
+                        </button>
+                        <button class="management-tab" type="button" data-entity="associations">
+                            <i class="bi bi-people"></i> Associacoes
+                        </button>
+                        <button class="management-tab" type="button" data-entity="farmers">
+                            <i class="bi bi-person-workspace"></i> Agricultores
+                        </button>
+                        <button class="management-tab" type="button" data-entity="crops">
+                            <i class="bi bi-flower1"></i> Cultivos
+                        </button>
+                        <button class="management-tab" type="button" data-entity="recommendations">
+                            <i class="bi bi-clipboard2-pulse"></i> Recomendacoes
+                        </button>
+                    </div>
+
+                    <div class="management-heading">
+                        <div>
+                            <small id="managementKicker">Cadastro geografico</small>
+                            <h3 id="managementEntityTitle">Regioes</h3>
+                            <p id="managementDescription">Consulte e mantenha as regioes monitoradas pela plataforma.</p>
+                        </div>
+                        <button class="btn btn-outline-success btn-sm" id="refreshManagement" type="button">
+                            <i class="bi bi-arrow-clockwise"></i> Atualizar lista
+                        </button>
+                    </div>
+
+                    <div class="table-responsive" id="managementTableWrapper">
+                        <table class="table management-table align-middle mb-0">
+                            <thead>
+                                <tr id="managementTableHead"></tr>
+                            </thead>
+                            <tbody id="managementTableBody">
+                                <tr>
+                                    <td class="empty-state">
+                                        <span class="spinner-border spinner-border-sm text-success"></span>
+                                        Carregando registros...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="management-unavailable d-none" id="managementUnavailable">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <h3>Cadastro indisponivel</h3>
+                            <p>CRUD de agricultores nao disponivel no backend.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-section pb-5" aria-labelledby="validationTitle">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-kicker">Diagnostico tecnico</span>
+                        <h2 id="validationTitle">Validacao do sistema</h2>
+                    </div>
+                    <button class="btn btn-outline-success btn-sm" id="verifySystem" type="button">
+                        <i class="bi bi-shield-check"></i> Verificar sistema
+                    </button>
+                </div>
+
+                <div class="panel-card validation-panel">
+                    <div class="validation-summary">
+                        <div class="validation-summary-icon" id="validationSummaryIcon">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <div>
+                            <span>Estado da integracao</span>
+                            <h3 id="validationSummaryTitle">Verificando conexoes...</h3>
+                            <p id="validationSummaryText">Aguarde enquanto o front valida a API e os arquivos locais.</p>
+                        </div>
+                    </div>
+
+                    <div class="validation-grid">
+                        <div class="validation-check is-pending" id="validationBackend">
+                            <span class="validation-check-icon"><i class="bi bi-three-dots"></i></span>
+                            <span>
+                                <strong>Backend</strong>
+                                <small>Verificando conexao com a API</small>
+                            </span>
+                        </div>
+                        <div class="validation-check is-pending" id="validationHealth">
+                            <span class="validation-check-icon"><i class="bi bi-three-dots"></i></span>
+                            <span>
+                                <strong>Health Check</strong>
+                                <small>Verificando resposta de /health</small>
+                            </span>
+                        </div>
+                        <div class="validation-check is-pending" id="validationDashboard">
+                            <span class="validation-check-icon"><i class="bi bi-three-dots"></i></span>
+                            <span>
+                                <strong>Dashboard</strong>
+                                <small>Verificando /api/Dashboard/resumo</small>
+                            </span>
+                        </div>
+                        <div class="validation-check is-pending" id="validationRegions">
+                            <span class="validation-check-icon"><i class="bi bi-three-dots"></i></span>
+                            <span>
+                                <strong>Regioes</strong>
+                                <small>Verificando /api/Regioes</small>
+                            </span>
+                        </div>
+                        <div class="validation-check is-pending" id="validationHistory">
+                            <span class="validation-check-icon"><i class="bi bi-three-dots"></i></span>
+                            <span>
+                                <strong>Historico climatico</strong>
+                                <small>Verificando endpoint de historico</small>
+                            </span>
+                        </div>
+                        <div class="validation-check is-pending" id="validationApiBase">
+                            <span class="validation-check-icon"><i class="bi bi-three-dots"></i></span>
+                            <span>
+                                <strong>Configuracao API_BASE</strong>
+                                <small>Verificando URL e porta configuradas</small>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="validation-details">
+                        <div class="api-base-box">
+                            <span>API_BASE atual</span>
+                            <code id="apiBaseCurrent">Detectando...</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="container">
+                <span><i class="bi bi-leaf-fill"></i> Celticstech</span>
+                <small>Global Solution 2026/1 · Economia Espacial</small>
+            </div>
+        </footer>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" aria-live="polite"></div>
+
+    <div class="modal fade" id="entityModal" tabindex="-1" aria-labelledby="entityModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <form id="entityForm">
+                    <div class="modal-header">
+                        <div>
+                            <small class="modal-kicker" id="entityModalKicker">Gerenciamento</small>
+                            <h2 class="modal-title fs-5" id="entityModalTitle">Novo registro</h2>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3" id="entityFormFields"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success" id="saveEntity">
+                            <i class="bi bi-check-lg"></i> Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="deleteModalTitle">Confirmar exclusao</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="delete-confirmation">
+                        <span><i class="bi bi-exclamation-triangle"></i></span>
+                        <div>
+                            <strong>Deseja realmente excluir este registro?</strong>
+                            <p id="deleteRecordName">Esta acao nao pode ser desfeita.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmDelete">
+                        <i class="bi bi-trash3"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="historyDetailModal" tabindex="-1" aria-labelledby="historyDetailTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <small class="modal-kicker">Historico climatico</small>
+                        <h2 class="modal-title fs-5" id="historyDetailTitle">Detalhes da recomendacao</h2>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body" id="historyDetailBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -3,6 +3,7 @@ using System;
 using Celticstech.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Celticstech.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260609053852_AddLatitudeLongitudeRegiao")]
+    partial class AddLatitudeLongitudeRegiao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,15 +33,7 @@ namespace Celticstech.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdAgricultor"));
 
-                    b.Property<string>("Cpf")
-                        .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("character varying(11)");
-
-                    b.Property<int>("IdAssociacao")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("IdCultivo")
+                    b.Property<int>("Idade")
                         .HasColumnType("integer");
 
                     b.Property<string>("NomeAgricultor")
@@ -46,16 +41,15 @@ namespace Celticstech.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("character varying(80)");
 
-                    b.Property<string>("Telefone")
+                    b.Property<int>("QtdeDependentes")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Sexo")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)");
+                        .HasMaxLength(1)
+                        .HasColumnType("character varying(1)");
 
                     b.HasKey("IdAgricultor");
-
-                    b.HasIndex("IdAssociacao");
-
-                    b.HasIndex("IdCultivo");
 
                     b.ToTable("Agricultores");
                 });
@@ -154,15 +148,8 @@ namespace Celticstech.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdRecomendacao"));
 
-                    b.Property<double?>("Chuva")
-                        .HasColumnType("double precision");
-
                     b.Property<DateTime>("DataRecAsc")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("FonteDados")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("IdAssociacao")
                         .HasColumnType("integer");
@@ -170,31 +157,15 @@ namespace Celticstech.Migrations
                     b.Property<int>("IdCultivo")
                         .HasColumnType("integer");
 
-                    b.Property<string>("NivelRisco")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
                     b.Property<string>("Orientacao")
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
-                    b.Property<int?>("ScoreRisco")
-                        .HasColumnType("integer");
-
-                    b.Property<double?>("Temperatura")
-                        .HasColumnType("double precision");
-
                     b.Property<string>("TipoRecomendacao")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
-
-                    b.Property<double?>("Umidade")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("VelocidadeVento")
-                        .HasColumnType("double precision");
 
                     b.HasKey("IdRecomendacao");
 
@@ -234,25 +205,6 @@ namespace Celticstech.Migrations
                     b.ToTable("Regioes");
                 });
 
-            modelBuilder.Entity("Celticstech.Models.Agricultor", b =>
-                {
-                    b.HasOne("Celticstech.Models.Associacao", "Associacao")
-                        .WithMany("Agricultores")
-                        .HasForeignKey("IdAssociacao")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Celticstech.Models.Cultivo", "Cultivo")
-                        .WithMany("Agricultores")
-                        .HasForeignKey("IdCultivo")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Associacao");
-
-                    b.Navigation("Cultivo");
-                });
-
             modelBuilder.Entity("Celticstech.Models.Associacao", b =>
                 {
                     b.HasOne("Celticstech.Models.Regiao", "Regiao")
@@ -285,15 +237,11 @@ namespace Celticstech.Migrations
 
             modelBuilder.Entity("Celticstech.Models.Associacao", b =>
                 {
-                    b.Navigation("Agricultores");
-
                     b.Navigation("Recomendacoes");
                 });
 
             modelBuilder.Entity("Celticstech.Models.Cultivo", b =>
                 {
-                    b.Navigation("Agricultores");
-
                     b.Navigation("Recomendacoes");
                 });
 

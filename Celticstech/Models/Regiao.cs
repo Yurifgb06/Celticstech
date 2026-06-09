@@ -15,6 +15,14 @@ namespace Celticstech.Models
         [MaxLength(2, ErrorMessage = "A UF deve ter no máximo 2 caracteres.")]
         public string UfRegiao { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "A latitude da região é obrigatória.")]
+        [Range(-90, 90, ErrorMessage = "A latitude deve estar entre -90 e 90.")]
+        public double Latitude { get; set; }
+
+        [Required(ErrorMessage = "A longitude da região é obrigatória.")]
+        [Range(-180, 180, ErrorMessage = "A longitude deve estar entre -180 e 180.")]
+        public double Longitude { get; set; }
+
         public ICollection<Associacao> Associacoes { get; set; } = new List<Associacao>();
     }
 }
